@@ -1,4 +1,4 @@
-name: CI Front-end
+name: CI/CD Front-end
 
 on:
   push:
@@ -7,6 +7,9 @@ on:
   pull_request:
     branches:
       - main
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -25,5 +28,18 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-      - name: Executar build
+      - name: Executar testes
+        run: npm test -- --watchAll=false
+
+      - name: Criar build
         run: npm run build
+
+      - name: Fazer deploy no GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+
+
+
